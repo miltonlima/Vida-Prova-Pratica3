@@ -38,7 +38,7 @@ namespace SistemaCompra.Application.SolicitacaoCompra.Command.RegistrarCompra
             }
 
             solicitacaoCompra.RegistrarCompra(solicitacaoCompra.Itens);
-            await _solicitacaoCompraRepository.RegistrarAsync(solicitacaoCompra);
+            await _solicitacaoCompraRepository.RegistrarCompra(solicitacaoCompra);
 
             return Unit.Value;
         }

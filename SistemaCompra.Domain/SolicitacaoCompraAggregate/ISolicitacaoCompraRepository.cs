@@ -6,6 +6,6 @@ namespace SistemaCompra.Domain.SolicitacaoCompraAggregate
     public interface ISolicitacaoCompraRepository
     {
         Task<SolicitacaoCompra> ObterAsync(Guid id);
-        Task RegistrarAsync(SolicitacaoCompra solicitacaoCompra);
+        Task RegistrarCompra(SolicitacaoCompra solicitacaoCompra);
     }
 }
