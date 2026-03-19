@@ -1,4 +1,5 @@
 using MediatR;
+using SistemaCompra.Application.Services;
 using SistemaCompra.Domain.ProdutoAggregate;
 using SistemaCompra.Domain.SolicitacaoCompraAggregate;
 using System.Threading;
@@ -10,13 +11,19 @@ namespace SistemaCompra.Application.SolicitacaoCompra.Command.RegistrarCompra
     {
         private readonly ISolicitacaoCompraRepository _solicitacaoCompraRepository;
         private readonly IProdutoRepository _produtoRepository;
+        private readonly IEmailService _emailService;
+        private readonly INotificacaoFornecedorService _notificacaoFornecedorService;
 
         public RegistrarCompraCommandHandler(
             ISolicitacaoCompraRepository solicitacaoCompraRepository,
-            IProdutoRepository produtoRepository)
+            IProdutoRepository produtoRepository,
+            IEmailService emailService,
+            INotificacaoFornecedorService notificacaoFornecedorService)
         {
             _solicitacaoCompraRepository = solicitacaoCompraRepository;
             _produtoRepository = produtoRepository;
+            _emailService = emailService;
+            _notificacaoFornecedorService = notificacaoFornecedorService;
         }
 
         async Task<Unit> IRequestHandler<RegistrarCompraCommand, Unit>.Handle(RegistrarCompraCommand request, CancellationToken cancellationToken)
@@ -39,6 +46,13 @@ namespace SistemaCompra.Application.SolicitacaoCompra.Command.RegistrarCompra
 
             solicitacaoCompra.RegistrarCompra(solicitacaoCompra.Itens);
             await _solicitacaoCompraRepository.RegistrarCompra(solicitacaoCompra);
+            await _emailService.EnviarParaClienteAsync(
+                solicitacaoCompra.UsuarioSolicitante.Nome,
+                "Compra efetivada",
+                $"Sua compra foi efetivada com total de {solicitacaoCompra.TotalGeral.Value}.");
+            await _notificacaoFornecedorService.NotificarFornecedorAsync(
+                solicitacaoCompra.NomeFornecedor.Nome,
+                $"Nova solicitação de compra efetivada no valor de {solicitacaoCompra.TotalGeral.Value}.");
 
             return Unit.Value;
         }
