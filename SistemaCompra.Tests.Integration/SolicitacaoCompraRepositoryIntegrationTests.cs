@@ -20,9 +20,11 @@ namespace SistemaCompra.Tests.Integration
             _fixture = fixture;
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task RegistrarCompra_E_ObterAsync_Devem_Persistir_E_CarregarDados()
         {
+            Skip.IfNot(_fixture.DockerDisponivel, "Docker não disponível para executar testes de integração com Testcontainers.");
+
             var dbName = $"SistemaCompraTest_{Guid.NewGuid():N}";
             var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(_fixture.ConnectionString)
             {

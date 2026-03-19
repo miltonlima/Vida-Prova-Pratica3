@@ -6,25 +6,45 @@ namespace SistemaCompra.Tests.Integration
 {
     public class SqlServerContainerFixture : IAsyncLifetime
     {
-        private readonly MsSqlContainer _container;
+        private MsSqlContainer? _container;
+        public bool DockerDisponivel { get; private set; }
 
-        public SqlServerContainerFixture()
+        public string ConnectionString
         {
-            _container = new MsSqlBuilder()
-                .WithPassword("Your_strong_password123")
-                .Build();
+            get
+            {
+                if (_container == null)
+                {
+                    return string.Empty;
+                }
+
+                return _container.GetConnectionString();
+            }
         }
 
-        public string ConnectionString => _container.GetConnectionString();
-
-        public Task InitializeAsync()
+        public async Task InitializeAsync()
         {
-            return _container.StartAsync();
+            try
+            {
+                _container = new MsSqlBuilder()
+                    .WithPassword("Your_strong_password123")
+                    .Build();
+
+                await _container.StartAsync();
+                DockerDisponivel = true;
+            }
+            catch
+            {
+                DockerDisponivel = false;
+            }
         }
 
-        public Task DisposeAsync()
+        public async Task DisposeAsync()
         {
-            return _container.DisposeAsync().AsTask();
+            if (_container != null)
+            {
+                await _container.DisposeAsync().AsTask();
+            }
         }
     }
 }
