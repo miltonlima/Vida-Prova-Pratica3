@@ -31,9 +31,12 @@ namespace SistemaCompra.Infra.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseLoggerFactory(loggerFactory)  
-                .EnableSensitiveDataLogging()
-                .UseSqlServer(@"Server=localhost\SQLEXPRESS01;Database=SistemaCompraDb;Trusted_Connection=True;MultipleActiveResultSets=true");
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseLoggerFactory(loggerFactory)
+                    .EnableSensitiveDataLogging()
+                    .UseSqlServer(@"Server=localhost\SQLEXPRESS01;Database=SistemaCompraDb;Trusted_Connection=True;MultipleActiveResultSets=true");
+            }
         }
     }
 }
